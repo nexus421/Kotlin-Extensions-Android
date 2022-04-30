@@ -98,11 +98,11 @@ fun String.coverString(@IntRange(from = 0) start: Int, @IntRange(from = 1) end: 
  * @param isNull Wird aufgerufen, wenn der Caller null ist
  * @param notNull Wird aufgerufen, wenn der Caller nicht null ist. Das Objekt kann dann sicher als notNull verwendet werden.
  */
-inline fun <T> T?.ifNull(
-    isNull: () -> Unit,
-    notNull: T.() -> Unit,
-    ){
-    if(this == null) isNull()
+inline fun <T, R> T?.ifNull(
+    isNull: () -> R,
+    notNull: T.() -> R,
+): R {
+    return if(this == null) isNull()
     else notNull()
 }
 
