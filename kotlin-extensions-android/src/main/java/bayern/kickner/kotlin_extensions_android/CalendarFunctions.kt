@@ -2,6 +2,7 @@ package bayern.kickner.kotlin_extensions_android
 
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 
 fun Calendar.setTimeMillis(time: Long): Calendar {
@@ -44,3 +45,16 @@ fun String.toDate(pattern: String  = "dd.MM.yyyy"): Date? {
 }
 
 fun getCalendarFromMillis(millis: Long, locale: Locale = Locale.GERMANY) = Calendar.getInstance(locale).setTimeMillis(millis)
+
+fun Date.toCalendar(locale: Locale = Locale.getDefault()) = Calendar.getInstance(locale).setTimeMillis(time)
+
+/**
+ * If you have a Pair with two Calendars in it, you can easily calculate the difference in milliseconds with this method.
+ */
+fun Pair<Calendar, Calendar>.calculateTimeDiffInMinutes(): Long {
+    return TimeUnit.MILLISECONDS.toMinutes((second.time.time ?: 0) - (first.time.time ?: 0))
+}
+
+infix fun Date.addMillis(millis: Long) {
+    time += millis
+}
