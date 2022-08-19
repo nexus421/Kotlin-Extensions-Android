@@ -5,9 +5,12 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.view.View
 import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -85,5 +88,34 @@ fun Activity.warningSnackbar(msg: String, timeLong: Boolean = true) {
 fun Activity.snackbar(msg: String, timeLong: Boolean = true, @ColorInt backgroundColor: Int = Color.parseColor("#E09C24")): Snackbar {
     return Snackbar.make(window.decorView.findViewById(android.R.id.content), msg, if(timeLong) Snackbar.LENGTH_LONG else Snackbar.LENGTH_SHORT)
         .setBackgroundTint(backgroundColor)
+}
 
+/**
+ * Checks if a permission is already granted with a fast check against ContextCompat.checkSelfPermission.
+ * If this is false, the permission will be requested from the user via registerForActivityResult.
+ *
+ * Hint: If the user denies the permission request more than 2 times, this method will always return false!
+ *
+ * @param manifestPermission Permission String to check from Manifest.permission.*
+ * @param onResult the result from the permission check.
+ */
+fun ComponentActivity.checkAndRequestPermission(manifestPermission: String, onResult: (Boolean) -> Unit) {
+    if(ContextCompat.checkSelfPermission(this, manifestPermission) == PackageManager.PERMISSION_GRANTED) return onResult(true)
+    registerForActivityResult(ActivityResultContracts.RequestPermission(), onResult).launch(manifestPermission)
+}
+
+/**
+ * Checks if a permission is already granted with a fast check against ContextCompat.checkSelfPermission.
+ * If all permissions are granted, this method calls the callback with the permissions and true for each entry.
+ * Therefore the less performant way of registerForActivity can be ignored.
+ * If any is false, all permissions will be requested from the user via registerForActivityResult.
+ *
+ * Hint: If the user denies the permission request more than 2 times, this method will always return false!
+ *
+ * @param manifestPermissions Permission Strings to check from Manifest.permission.*
+ * @param onResult the result from the permission check. Map<PermissionString, Granted>
+ */
+fun ComponentActivity.checkAndRequestPermissions(manifestPermissions: List<String>, onResult: (Map<String, Boolean>) -> Unit) {
+    if(manifestPermissions.find { ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED } == null) return onResult(manifestPermissions.associateBy({it}, {true}))
+    registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions(), onResult).launch(manifestPermissions.toTypedArray())
 }
