@@ -2,7 +2,7 @@
 
 ***Now Available on Jitpack!***
 In settings.gradle, add *maven { url 'https://jitpack.io' }* 
-In your build.gradle add *implementation 'com.github.nexus421:Kotlin-Extensions-Android:1.0.0'*
+In your build.gradle add *implementation 'com.github.nexus421:Kotlin-Extensions-Android:1.1.0'* (Check Releases for other verions)
 
 **Examples:**
 **String.hash()** -> Hash any String fast and easily
