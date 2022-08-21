@@ -81,3 +81,20 @@ inline fun String?.ifNullOrBlank(action: () -> String): String {
     return if (isNullOrBlank()) action()
     else this
 }
+
+/**
+ * Replaces all characters from a String matching "match" until the first character is found, which does not equal "match"
+ * Example:
+ * String = "0001234"
+ * match = '0'
+ * Result = "1234"
+ *
+ * @param match Character wich should be removed from the start
+ * @return String which does not start with "match"
+ */
+fun String.replaceAllMatchingStart(match: Char): String {
+    toCharArray().forEachIndexed { index, c ->
+        if (c != match) return substring(index)
+    }
+    return this
+}
