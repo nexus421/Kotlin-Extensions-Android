@@ -98,3 +98,6 @@ fun String.replaceAllMatchingStart(match: Char): String {
     }
     return this
 }
+
+fun String?.embedIfNotNull(before: String = "", after: String = "", fallback: String = "") = if(this == null) fallback else before + this + after
+
