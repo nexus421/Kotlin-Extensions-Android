@@ -1,6 +1,10 @@
 package bayern.kickner.kotlin_extensions_android
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import java.text.SimpleDateFormat
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -58,3 +62,6 @@ fun Pair<Calendar, Calendar>.calculateTimeDiffInMinutes(): Long {
 infix fun Date.addMillis(millis: Long) {
     time += millis
 }
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun LocalTime.toHHMM() = format(DateTimeFormatter.ofPattern("HH:mm"))
