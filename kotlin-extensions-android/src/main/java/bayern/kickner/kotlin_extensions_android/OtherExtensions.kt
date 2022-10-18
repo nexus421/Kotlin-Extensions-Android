@@ -55,20 +55,6 @@ fun Drawable.drawableToBitmap(): Bitmap {
     return bitmap
 }
 
-/**
- * Iterates this Iterable and calls action.
- * If the current iteration is the last one, the Boolean will be true, false otherwise.
- *
- * @param action Callback for each iteration. T == Element, Boolean == IsLastElement
- */
-inline fun <T> Iterable<T>.forEachDoLast(action: (T, Boolean) -> Unit) {
-    val end = count()
-    forEachIndexed { index, t ->
-        action(t, index == end - 1)
-    }
-}
-
-
 fun Context.inflate(@LayoutRes layoutId: Int) = View.inflate(this, layoutId, null)
 
 inline fun <reified C, R> Any.letCast(block: (C) -> R): R = (this as C).let(block)

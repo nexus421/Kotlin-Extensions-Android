@@ -101,3 +101,6 @@ fun String.replaceAllMatchingStart(match: Char): String {
 
 fun String?.embedIfNotNull(before: String = "", after: String = "", fallback: String = "") = if(this == null) fallback else before + this + after
 
+fun String?.isNotNullOrBlank(doThis: (String) -> Unit) {
+    if (this != null && isNotBlank()) doThis(this)
+}

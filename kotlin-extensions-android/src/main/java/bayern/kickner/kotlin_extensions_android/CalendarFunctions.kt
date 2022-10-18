@@ -3,7 +3,10 @@ package bayern.kickner.kotlin_extensions_android
 import android.os.Build
 import androidx.annotation.RequiresApi
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -48,8 +51,6 @@ fun String.toDate(pattern: String  = "dd.MM.yyyy"): Date? {
     }
 }
 
-fun getCalendarFromMillis(millis: Long, locale: Locale = Locale.GERMANY) = Calendar.getInstance(locale).setTimeMillis(millis)
-
 fun Date.toCalendar(locale: Locale = Locale.getDefault()) = Calendar.getInstance(locale).setTimeMillis(time)
 
 /**
@@ -65,3 +66,12 @@ infix fun Date.addMillis(millis: Long) {
 
 @RequiresApi(Build.VERSION_CODES.O)
 fun LocalTime.toHHMM() = format(DateTimeFormatter.ofPattern("HH:mm"))
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun LocalDate.getAsDate() = Date.from( atStartOfDay(ZoneId.systemDefault()).toInstant())
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun LocalTime.getAsDate() = Date.from(atDate(LocalDate.now()).atZone(ZoneId.systemDefault()).toInstant())
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun LocalDateTime.getAsDate() = Date.from(atZone(ZoneId.systemDefault()).toInstant())
