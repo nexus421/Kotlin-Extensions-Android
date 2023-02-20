@@ -1,7 +1,13 @@
 package bayern.kickner.kotlin_extensions_android
 
+import android.util.Log
 import androidx.annotation.IntRange
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.security.MessageDigest
+import java.util.*
+import java.util.zip.GZIPInputStream
+import java.util.zip.GZIPOutputStream
 
 /**
  * Der übergebene String wird, abgesehen vom ersten und letzten Zeichen, durch Sternchen ersetzt.
@@ -103,4 +109,42 @@ fun String?.embedIfNotNull(before: String = "", after: String = "", fallback: St
 
 fun String?.isNotNullOrBlank(doThis: (String) -> Unit) {
     if (this != null && isNotBlank()) doThis(this)
+}
+
+/**
+ * Compresses any String. Only usefully for large strings due to overhead. -> More Chars, better compression.
+ *
+ * @return Compressed String as Base64 or null, if an error occurred
+ */
+fun String?.compress(): String? = try {
+    if (isNullOrBlank()) {
+        this
+    } else {
+        val out = ByteArrayOutputStream()
+        GZIPOutputStream(out).use {
+            it.write(toByteArray())
+        }
+        android.util.Base64.encodeToString(out.toByteArray(), android.util.Base64.DEFAULT)
+    }
+} catch (e: Exception) {
+    Log.e("Compress", e.message ?: "Error while compressing")
+    null
+}
+
+/**
+ * Decompress a Base64 based String, which was compressed with [compress].
+ *
+ * @return decompressed String or null when an error occurred.
+ */
+fun String?.decompress(): String? = try {
+    if (isNullOrBlank()) {
+        this
+    } else {
+        GZIPInputStream(ByteArrayInputStream(android.util.Base64.decode(this, android.util.Base64.DEFAULT))).use {
+            String(it.readBytes())
+        }
+    }
+} catch (e: Exception) {
+    Log.e("Compress", e.message ?: "Error while compressing")
+    null
 }

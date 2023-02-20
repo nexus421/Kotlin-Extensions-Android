@@ -23,6 +23,22 @@ fun <T> measureTimeMillisAndReturn(block: () -> T): ResultTimeMeasure<T> {
 
 data class ResultTimeMeasure<T>(val result: T, val timeMillis: Long)
 
+/**
+ * Executes action as long as not null is returned.
+ * If action returns null, the callback onNull will be called.
+ *
+ * @return The first Object, which ist not null.
+ */
+inline fun <reified T> doUntilNotNull(noinline onNull: (() -> Unit)? = null, action: () -> T?): T {
+    while (true) {
+        action()?.let {
+            return it
+        } ?: onNull?.invoke()
+    }
+}
+
+
+
 
 
 

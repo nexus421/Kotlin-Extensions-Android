@@ -6,19 +6,21 @@ import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.os.Build
 import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.LayoutRes
 import androidx.core.content.FileProvider
 import java.io.File
+import java.nio.file.Files
 
 
 /**
  * This gets the name of the current Class.
  * I use this for my Logs. So I always have an identical TAG to use
  */
-val Any.TAG: String
+inline val Any.TAG: String
     get() = javaClass.simpleName
 
 /**
@@ -100,3 +102,13 @@ fun <D> Any.set(varName: String, valueToSet: D) {
     val setterName = "set${varName.replace(".", "").replaceFirstChar { it.toString().uppercase() }}"
     callMethodByName<D>(setterName, valueToSet)
 }
+
+/**
+ * File-size in Bytes, depending on used OS-Version
+ */
+fun File.getSize() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+    Files.size(toPath())
+} else {
+    length()
+}
+

@@ -65,6 +65,10 @@ infix fun Date.addMillis(millis: Long) {
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
+fun Date.convertToLocalDateTime() = toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
+
+
+@RequiresApi(Build.VERSION_CODES.O)
 fun LocalTime.toHHMM() = format(DateTimeFormatter.ofPattern("HH:mm"))
 
 @RequiresApi(Build.VERSION_CODES.O)
