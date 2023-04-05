@@ -8,6 +8,11 @@ package bayern.kickner.kotlin_extensions_android
  */
 sealed class ResultOf<out T> {
     data class Success<out R>(val value: R): ResultOf<R>()
-    data class Failure(val message: String?, val throwable: Throwable?): ResultOf<Nothing>()
+    data class Failure(val message: String?, val throwable: Throwable? = null): ResultOf<Nothing>()
+}
+
+sealed class ResultOf2<out T> {
+    data class Success<out R>(val value: R): ResultOf<R>()
+    data class Failure<out V>(val value: V): ResultOf<V>()
 }
 
