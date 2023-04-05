@@ -148,3 +148,11 @@ fun String?.decompress(): String? = try {
     Log.e("Compress", e.message ?: "Error while compressing")
     null
 }
+
+/**
+ * Checks if this string is contained in that string or if that string is contained in this string
+ *
+ * @param that other String to check for containment
+ * @param ignoreCase true to ignore character case when comparing strings. By default false.
+ */
+fun String.crossContains(that: String, ignoreCase: Boolean = false) = this.contains(that, ignoreCase) || that.contains(this, ignoreCase)
