@@ -11,7 +11,7 @@ import kotlin.system.measureTimeMillis
 fun runOnUiThread(r: Runnable) = Handler(Looper.getMainLooper()).post(r)
 
 /**
- * Measures the time like measureTimeMillis. But this Method can return anything with the Time for executing the block.
+ * Measures the time like measureTimeMillis. But this method can return anything including the execution time.
  */
 fun <T> measureTimeMillisAndReturn(block: () -> T): ResultTimeMeasure<T> {
     val result: T
@@ -24,7 +24,7 @@ fun <T> measureTimeMillisAndReturn(block: () -> T): ResultTimeMeasure<T> {
 data class ResultTimeMeasure<T>(val result: T, val timeMillis: Long)
 
 /**
- * Executes action as long as not null is returned.
+ * Executes action as long as it returns not null.
  * If action returns null, the callback onNull will be called.
  *
  * @return The first Object, which ist not null.

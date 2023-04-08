@@ -29,29 +29,14 @@ fun <T> T?.isNotNull() = this != null
  */
 fun <T> T?.default(value: T) = this ?: value
 
-/**
- * Ersetzt if/else
- *
- * @param isNull Wird aufgerufen, wenn der Caller null ist
- * @param notNull Wird aufgerufen, wenn der Caller nicht null ist. Das Objekt kann dann sicher als notNull verwendet werden.
- *
- * @return Returned ein beliebiges Ergebnis innerhalb der Blöcke, nullable
- */
-inline fun <T, K> T?.ifNullAndReturnNullable(
-    isNull: () -> K?,
-    notNull: T.() -> K?,
-): K? {
-    return if (this == null) isNull()
-    else notNull(this)
-}
 
 /**
- * Ersetzt if/else
+ * Alternative to if/else
  *
- * @param isNull Wird aufgerufen, wenn der Caller null ist
- * @param notNull Wird aufgerufen, wenn der Caller nicht null ist. Das Objekt kann dann sicher als notNull verwendet werden.
+ * @param isNull Will be called, when caller is null.
+ * @param notNull Will be called, when caller is not null.
  *
- * @return Returned ein beliebiges Ergebnis innerhalb der Blöcke
+ * @return an object (default <T, K> non null, <T, K?> nullable>
  */
 inline fun <T, K> T?.ifNullAndReturn(
     isNull: () -> K,

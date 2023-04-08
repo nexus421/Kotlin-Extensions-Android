@@ -8,5 +8,6 @@ enum class UriExtensionsError {
     InsertionFailed,
     InputErrorProviderCrashed,
     FileNotFound,
-    InvalidColumnIndex
+    InvalidColumnIndex,
+    WriteFailed
 }

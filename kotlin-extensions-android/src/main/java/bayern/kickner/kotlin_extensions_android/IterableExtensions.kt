@@ -18,6 +18,13 @@ inline fun <T> Iterable<T>.contains(predicate: (T) -> Boolean): Boolean {
     return false
 }
 
+/**
+ * Splits this list into two.
+ *
+ * @param predicate condition. On true fills trueList, on false fills falseList
+ *
+ * @return SplitList containing splitted list
+ */
 inline fun <T> Iterable<T>.splitFilter(predicate: (T) -> Boolean): SplitList<T> {
     val trueList = mutableListOf<T>()
     val falseList = mutableListOf<T>()

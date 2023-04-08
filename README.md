@@ -2,7 +2,7 @@
 
 ***Now Available on Jitpack!***
 In settings.gradle, add *maven { url 'https://jitpack.io' }* 
-In your build.gradle add *implementation 'com.github.nexus421:Kotlin-Extensions-Android:1.6.0'* (Check Releases for other verions)
+In your build.gradle add *implementation 'com.github.nexus421:Kotlin-Extensions-Android:2.0.0'* (Check Releases for other verions)
 
 **Examples:**
 **String.hash()** -> Hash any String fast and easily
@@ -13,7 +13,7 @@ In your build.gradle add *implementation 'com.github.nexus421:Kotlin-Extensions-
 
 **File Management**
 Helper-Methods to work with files trough URI for the public folders (Download, Documents) with the new MediaStore.
-More is on the way...
+FileHelper for faster and more easy access to some important folders without URI.
 
 *Useful functions for Calendar, Boolean, String, View, Generics, etc.*
 

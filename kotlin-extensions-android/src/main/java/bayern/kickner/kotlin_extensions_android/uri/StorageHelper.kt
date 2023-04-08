@@ -1,4 +1,4 @@
-package bayern.kickner.kotlin_extensions_android
+package bayern.kickner.kotlin_extensions_android.uri
 
 import android.app.Activity
 import android.content.ContentValues
@@ -9,7 +9,9 @@ import android.os.Build
 import android.provider.MediaStore
 import androidx.annotation.RequiresApi
 import androidx.core.content.edit
+import bayern.kickner.kotlin_extensions_android.ResultOf
 
+@Deprecated("Use UriHelper-Methds instead")
 @RequiresApi(Build.VERSION_CODES.Q)
 object StorageHelper {
 
@@ -37,7 +39,7 @@ object StorageHelper {
         }
     }
 
-    fun writeFile(context: Context, filename: String, mimeType: String = "text/plain", input: String) = StorageHelper.writeFile(context, filename, mimeType, input.toByteArray())
+    fun writeFile(context: Context, filename: String, mimeType: String = "text/plain", input: String) = writeFile(context, filename, mimeType, input.toByteArray())
 
     fun writeFile(context: Context, filename: String, mimeType: String = "text/plain", input: ByteArray): ResultOf<Uri> {
         val contentValues = ContentValues().apply {
@@ -57,6 +59,9 @@ object StorageHelper {
         return ResultOf.Success(uri)
     }
 
+    /**
+     * This Method is not finished yet.
+     */
     fun shareUsableUriWithOtherApp(activity: Activity, mimeType: String = "text/plain", uri: Uri){
         val intent = Intent(Intent.ACTION_SEND)
         intent.type = mimeType
