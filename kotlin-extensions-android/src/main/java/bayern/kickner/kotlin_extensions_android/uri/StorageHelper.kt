@@ -10,6 +10,7 @@ import android.provider.MediaStore
 import androidx.annotation.RequiresApi
 import androidx.core.content.edit
 import bayern.kickner.kotlin_extensions_android.ResultOf
+import bayern.kickner.kotlin_extensions_android.ResultOfEmpty
 
 @Deprecated("Use UriHelper-Methds instead")
 @RequiresApi(Build.VERSION_CODES.Q)
