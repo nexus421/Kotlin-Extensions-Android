@@ -14,7 +14,6 @@ import java.util.zip.GZIPOutputStream
  * Siehe Dokumentation -> [.coverString]
  * Bsp. Hallo wird zu H***o
  *
- * @param s String der verschleiert werden soll
  * @return verschleierten String oder leerer String falls s == null
  */
 fun String.coverString() = coverString(1, this.length - 2)

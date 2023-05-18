@@ -12,7 +12,9 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.ColorInt
+import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker.PERMISSION_GRANTED
 import com.google.android.material.snackbar.Snackbar
@@ -39,6 +41,8 @@ fun Context.showToast(msg: String, length: Int = Toast.LENGTH_LONG) = Toast.make
 fun Context.hasCameraPermission() = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PERMISSION_GRANTED
 
 fun Context.hasFineLocationPermission() = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PERMISSION_GRANTED
+
+fun Context.inflate(@LayoutRes layoutId: Int) = View.inflate(this, layoutId, null)
 
 fun Context.getApplicationName(): String {
     val stringId = applicationInfo.labelRes
@@ -119,3 +123,12 @@ fun ComponentActivity.checkAndRequestPermissions(manifestPermissions: List<Strin
     if(manifestPermissions.find { ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED } == null) return onResult(manifestPermissions.associateBy({it}, {true}))
     registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions(), onResult).launch(manifestPermissions.toTypedArray())
 }
+
+/**
+ * Checks if the given Permissions are granted.
+ *
+ * @param permissions to check from [Manifest.permission]
+ *
+ * @return true if all are granted, false if at least one is not granted
+ */
+fun Activity.hasPermission(vararg permissions: String) = permissions.find { ActivityCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED } == null

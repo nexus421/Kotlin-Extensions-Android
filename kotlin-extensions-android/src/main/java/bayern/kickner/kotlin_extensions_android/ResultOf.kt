@@ -1,11 +1,5 @@
 package bayern.kickner.kotlin_extensions_android
 
-/**
- * Kotlin soll keine Exceptions direkt verwenden. Wenn es einen Fehler gibt, kann dafür einfach diese
- * sealed Class verwendet werden. Im Code kann dann geprüft werden, ob ResultOf is Success or Failure.
- *
- * Siehe: https://medium.com/swlh/kotlin-sealed-class-for-success-and-error-handling-d3054bef0d4e
- */
 sealed class ResultOf<out T> {
     data class Success<out R>(val value: R): ResultOf<R>()
     data class Failure(val message: String?, val throwable: Throwable? = null): ResultOf<Nothing>()
@@ -19,4 +13,9 @@ sealed class ResultOf2<out T, out V> {
 sealed class ResultOf3<out T, out V, out X> {
     data class Success<out E>(val value: E): ResultOf3<E, Nothing, Nothing>()
     data class Failure<out Q, out I>(val value: Q, val value2: I): ResultOf3<Nothing, Q, I>()
+}
+
+sealed class ResultOfEmpty<out T> {
+    object Success: ResultOf<Nothing>()
+    data class Failure<out T>(val value: T): ResultOf<T>()
 }

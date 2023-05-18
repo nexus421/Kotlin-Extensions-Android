@@ -15,3 +15,24 @@ inline fun Boolean.ifFalse(doThis: () -> Unit): Boolean {
     if (this.not()) doThis()
     return this
 }
+
+/**
+ * Executes [doThis] if this == [that]
+ *
+ * Use like this:
+ * if boolean ist true|false do this.
+ *
+ * var b = false
+ * b.ifBooleanIs(true) {
+ *      println("b is true")
+ * }
+ *
+ * @param that boolean which you want
+ * @param doThis executes this, if this == [that]
+ *
+ * @return the boolean value you called it with
+ */
+inline fun Boolean.ifBooleanIs(that: Boolean, doThis: () -> Unit): Boolean {
+    if(this == that) doThis()
+    return this
+}

@@ -5,13 +5,9 @@ import android.os.Bundle
 import android.os.Environment
 import android.widget.Button
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import bayern.kickner.kotlin_extensions_android.ResultOf2
 import bayern.kickner.kotlin_extensions_android.uri.AndroidFile
-import bayern.kickner.kotlin_extensions_android.uri.createFileInPublicAndWriteData
 import bayern.kickner.kotlin_extensions_android.uri.deleteFileThroughUri
-import bayern.kickner.kotlin_extensions_android.uri.getAllAccessibleFilesFromPublic
 import java.io.File
 
 class MainActivity : AppCompatActivity() {

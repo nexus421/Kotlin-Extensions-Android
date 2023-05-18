@@ -1,16 +1,13 @@
 package bayern.kickner.kotlin_extensions_android
 
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
-import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.LayoutRes
 import androidx.core.content.FileProvider
 import java.io.File
 import java.nio.file.Files
@@ -56,8 +53,6 @@ fun Drawable.drawableToBitmap(): Bitmap {
     draw(canvas)
     return bitmap
 }
-
-fun Context.inflate(@LayoutRes layoutId: Int) = View.inflate(this, layoutId, null)
 
 inline fun <reified C, R> Any.letCast(block: (C) -> R): R = (this as C).let(block)
 
