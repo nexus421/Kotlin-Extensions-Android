@@ -42,15 +42,6 @@ fun Date.format(pattern: String = "dd.MM.yyyy"): String {
     return sdf.format(this)
 }
 
-fun String.toDate(pattern: String  = "dd.MM.yyyy"): Date? {
-    val sdf = SimpleDateFormat(pattern, Locale.getDefault())
-    return try {
-        sdf.parse(this)
-    } catch (e: Exception){
-        null
-    }
-}
-
 fun Date.toCalendar(locale: Locale = Locale.getDefault()) = Calendar.getInstance(locale).setTimeMillis(time)
 
 /**

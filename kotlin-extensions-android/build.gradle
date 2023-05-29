@@ -58,7 +58,7 @@ afterEvaluate {
 
                 groupId = 'com.github.nexus421'
                 artifactId = 'Kotlin-Extensions-Android'
-                version = '2.0.3'
+                version = '2.1.0'
             }
         }
     }

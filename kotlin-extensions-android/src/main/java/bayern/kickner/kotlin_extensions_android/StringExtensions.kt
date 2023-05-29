@@ -1,10 +1,15 @@
 package bayern.kickner.kotlin_extensions_android
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.util.Log
 import androidx.annotation.IntRange
+import androidx.core.content.ContextCompat
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.security.MessageDigest
+import java.text.SimpleDateFormat
 import java.util.*
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
@@ -107,7 +112,7 @@ fun String.replaceAllMatchingStart(match: Char): String {
 fun String?.embedIfNotNull(before: String = "", after: String = "", fallback: String = "") = if(this == null) fallback else before + this + after
 
 fun String?.isNotNullOrBlank(doThis: (String) -> Unit) {
-    if (this != null && isNotBlank()) doThis(this)
+    if (!isNullOrBlank()) doThis(this)
 }
 
 /**
@@ -155,3 +160,27 @@ fun String?.decompress(): String? = try {
  * @param ignoreCase true to ignore character case when comparing strings. By default false.
  */
 fun String.crossContains(that: String, ignoreCase: Boolean = false) = this.contains(that, ignoreCase) || that.contains(this, ignoreCase)
+
+val String.isDigitOnly: Boolean
+    get() = matches(Regex("^\\d*\$"))
+
+val String.isAlphabeticOnly: Boolean
+    get() = matches(Regex("^[a-zA-Z]*\$"))
+
+val String.isAlphanumericOnly: Boolean
+    get() = matches(Regex("^[a-zA-Z\\d]*\$"))
+
+fun String.toDate(pattern: String = "dd.MM.yyyy"): Date? {
+    val sdf = SimpleDateFormat(pattern, Locale.getDefault())
+    return try {
+        sdf.parse(this)
+    } catch (e: Exception) {
+        null
+    }
+}
+
+fun String.copyToClipboard(context: Context) {
+    val clipboardManager = ContextCompat.getSystemService(context, ClipboardManager::class.java)
+    val clip = ClipData.newPlainText("clipboard", this)
+    clipboardManager?.setPrimaryClip(clip)
+}

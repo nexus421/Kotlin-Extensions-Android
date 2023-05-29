@@ -33,6 +33,12 @@ inline fun Boolean.ifFalse(doThis: () -> Unit): Boolean {
  * @return the boolean value you called it with
  */
 inline fun Boolean.ifBooleanIs(that: Boolean, doThis: () -> Unit): Boolean {
-    if(this == that) doThis()
+    if (this == that) doThis()
     return this
 }
+
+val Boolean?.orTrue: Boolean
+    get() = this ?: true
+
+val Boolean?.orFalse: Boolean
+    get() = this ?: false

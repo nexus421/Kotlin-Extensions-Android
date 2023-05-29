@@ -3,16 +3,30 @@ package bayern.kickner.kotlin_extensions_android
 import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
+import android.app.DownloadManager
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.graphics.Insets
+import android.graphics.Rect
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
+import android.util.DisplayMetrics
+import android.util.Size
 import android.view.View
+import android.view.WindowInsets
+import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.ColorInt
 import androidx.annotation.LayoutRes
+import androidx.annotation.RequiresApi
+import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -29,11 +43,11 @@ fun Context.showToastOnMainThread(s: String, length: Int = Toast.LENGTH_LONG) = 
 
 fun Activity.getRootView() = findViewById<View>(android.R.id.content).rootView
 
-fun Activity.startActivityAndFinishCurrent(destination: Class<*>, intentExtras: (Intent.() -> Unit)? = null) {
+fun Activity.startActivity(destination: Class<*>, finishCallingActivity: Boolean = false, intentExtras: (Intent.() -> Unit)? = null) {
     val i = Intent(this, destination)
-    intentExtras?.let { it(i) }
+    intentExtras?.invoke(i)
     startActivity(i)
-    finish()
+    if (finishCallingActivity) finish()
 }
 
 fun Context.showToast(msg: String, length: Int = Toast.LENGTH_LONG) = Toast.makeText(this, msg, length).show()
@@ -65,33 +79,42 @@ fun Activity.showSimpleDialog(title: String, msg: String) {
         .show()
 }
 
+@Deprecated("Use View.snackbar")
 fun Activity.successSnackbar(msg: String, timeLong: Boolean = true) {
-    Snackbar.make(window.decorView.findViewById(android.R.id.content), msg, if(timeLong) Snackbar.LENGTH_LONG else Snackbar.LENGTH_SHORT)
+    Snackbar.make(window.decorView.findViewById(android.R.id.content), msg, if (timeLong) Snackbar.LENGTH_LONG else Snackbar.LENGTH_SHORT)
         .setBackgroundTint(Color.parseColor("#0FCA3A"))
         .show()
 }
 
+@Deprecated("Use View.snackbar")
 fun Activity.errorSnackbar(msg: String, timeLong: Boolean = true) {
-    Snackbar.make(window.decorView.findViewById(android.R.id.content), msg, if(timeLong) Snackbar.LENGTH_LONG else Snackbar.LENGTH_SHORT)
+    Snackbar.make(window.decorView.findViewById(android.R.id.content), msg, if (timeLong) Snackbar.LENGTH_LONG else Snackbar.LENGTH_SHORT)
         .setBackgroundTint(Color.parseColor("#D21A1A"))
         .show()
 }
 
+@Deprecated("Use View.snackbar")
 fun Activity.infoSnackbar(msg: String, timeLong: Boolean = true) {
-    Snackbar.make(window.decorView.findViewById(android.R.id.content), msg, if(timeLong) Snackbar.LENGTH_LONG else Snackbar.LENGTH_SHORT)
+    Snackbar.make(window.decorView.findViewById(android.R.id.content), msg, if (timeLong) Snackbar.LENGTH_LONG else Snackbar.LENGTH_SHORT)
         .setBackgroundTint(Color.parseColor("#1985DA"))
         .show()
 }
 
+@Deprecated("Use View.snackbar")
 fun Activity.warningSnackbar(msg: String, timeLong: Boolean = true) {
-    Snackbar.make(window.decorView.findViewById(android.R.id.content), msg, if(timeLong) Snackbar.LENGTH_LONG else Snackbar.LENGTH_SHORT)
+    Snackbar.make(window.decorView.findViewById(android.R.id.content), msg, if (timeLong) Snackbar.LENGTH_LONG else Snackbar.LENGTH_SHORT)
         .setBackgroundTint(Color.parseColor("#E09C24"))
         .show()
 }
 
+@Deprecated("Use View.snackbar")
 fun Activity.snackbar(msg: String, timeLong: Boolean = true, @ColorInt backgroundColor: Int = Color.parseColor("#E09C24")): Snackbar {
-    return Snackbar.make(window.decorView.findViewById(android.R.id.content), msg, if(timeLong) Snackbar.LENGTH_LONG else Snackbar.LENGTH_SHORT)
+    return Snackbar.make(window.decorView.findViewById(android.R.id.content), msg, if (timeLong) Snackbar.LENGTH_LONG else Snackbar.LENGTH_SHORT)
         .setBackgroundTint(backgroundColor)
+}
+
+fun View.snackbar(message: String, duration: Int = Snackbar.LENGTH_LONG) {
+    Snackbar.make(this, message, duration).show()
 }
 
 /**
@@ -104,7 +127,7 @@ fun Activity.snackbar(msg: String, timeLong: Boolean = true, @ColorInt backgroun
  * @param onResult the result from the permission check.
  */
 fun ComponentActivity.checkAndRequestPermission(manifestPermission: String, onResult: (Boolean) -> Unit) {
-    if(ContextCompat.checkSelfPermission(this, manifestPermission) == PackageManager.PERMISSION_GRANTED) return onResult(true)
+    if (ContextCompat.checkSelfPermission(this, manifestPermission) == PackageManager.PERMISSION_GRANTED) return onResult(true)
     registerForActivityResult(ActivityResultContracts.RequestPermission(), onResult).launch(manifestPermission)
 }
 
@@ -120,7 +143,7 @@ fun ComponentActivity.checkAndRequestPermission(manifestPermission: String, onRe
  * @param onResult the result from the permission check. Map<PermissionString, Granted>
  */
 fun ComponentActivity.checkAndRequestPermissions(manifestPermissions: List<String>, onResult: (Map<String, Boolean>) -> Unit) {
-    if(manifestPermissions.find { ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED } == null) return onResult(manifestPermissions.associateBy({it}, {true}))
+    if (manifestPermissions.find { ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED } == null) return onResult(manifestPermissions.associateBy({ it }, { true }))
     registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions(), onResult).launch(manifestPermissions.toTypedArray())
 }
 
@@ -132,3 +155,56 @@ fun ComponentActivity.checkAndRequestPermissions(manifestPermissions: List<Strin
  * @return true if all are granted, false if at least one is not granted
  */
 fun Activity.hasPermission(vararg permissions: String) = permissions.find { ActivityCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED } == null
+
+fun Activity.hideKeyboard() {
+    val imm: InputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+    val view = currentFocus ?: View(this)
+    imm.hideSoftInputFromWindow(view.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+}
+
+@RequiresApi(Build.VERSION_CODES.M)
+@RequiresPermission("android.permission.ACCESS_NETWORK_STATE")
+fun Context.isNetworkAvailable(): Boolean {
+    val manager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    val capabilities = manager.getNetworkCapabilities(manager.activeNetwork)
+    return if (capabilities != null) {
+        capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
+                || capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
+                || capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
+    } else false
+}
+
+fun Context.getScreenSize(): Size {
+    val windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
+
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        val metrics = windowManager.currentWindowMetrics
+        val windowInsets = metrics.windowInsets
+        val insets: Insets = windowInsets.getInsetsIgnoringVisibility(
+            WindowInsets.Type.navigationBars()
+                    or WindowInsets.Type.displayCutout()
+        )
+
+        val insetsWidth: Int = insets.right + insets.left
+        val insetsHeight: Int = insets.top + insets.bottom
+        val bounds: Rect = metrics.bounds
+        Size(
+            bounds.width() - insetsWidth,
+            bounds.height() - insetsHeight
+        )
+    } else {
+        val displayMetrics = DisplayMetrics()
+        windowManager.defaultDisplay?.getMetrics(displayMetrics)
+        val height = displayMetrics.heightPixels
+        val width = displayMetrics.widthPixels
+        Size(width, height)
+    }
+}
+
+fun Context.windowManager() = ContextCompat.getSystemService(this, WindowManager::class.java)
+
+fun Context.connectivityManager() = ContextCompat.getSystemService(this, ConnectivityManager::class.java)
+
+fun Context.notificationManager() = ContextCompat.getSystemService(this, NotificationManager::class.java)
+
+fun Context.downloadManager() = ContextCompat.getSystemService(this, DownloadManager::class.java)
