@@ -14,11 +14,3 @@ fun getHeapInfo(): HeapInfo {
 }
 
 data class HeapInfo(val usedMemInMB: Long, val maxHeapSizeInMB: Long, val availableHeapSizeInMB: Long)
-
-/**
- * Creates a random String from allowedChard with a given length
- */
-fun getRandomString(length: Int, allowedChars: List<Char> = ('A'..'Z') + ('a'..'z') + ('0'..'9')) = (1..length)
-    .map { allowedChars.random() }
-    .joinToString("")
-

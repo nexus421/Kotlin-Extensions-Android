@@ -10,8 +10,6 @@ import android.provider.MediaStore
 import android.provider.MediaStore.MediaColumns
 import android.provider.OpenableColumns
 import androidx.annotation.RequiresApi
-import bayern.kickner.kotlin_extensions_android.ResultOf2
-import bayern.kickner.kotlin_extensions_android.ifFalse
 import java.io.File
 import java.io.FileNotFoundException
 
@@ -23,12 +21,12 @@ import java.io.FileNotFoundException
  *
  * @return SUCCESS: Input as ByteArray, FAILURE: UriExtensionError
  */
-fun Uri.readContentFromUri(context: Context): ResultOf2<ByteArray, UriExtensionsError> {
+fun Uri.readContentFromUri(context: Context): UriResult<ByteArray, UriExtensionsError> {
     try {
-        val input = context.contentResolver.openInputStream(this)?.use { it.readBytes() } ?: return ResultOf2.Failure(UriExtensionsError.InputErrorProviderCrashed)
-        return ResultOf2.Success(input)
+        val input = context.contentResolver.openInputStream(this)?.use { it.readBytes() } ?: return UriResult.Failure(UriExtensionsError.InputErrorProviderCrashed)
+        return UriResult.Success(input)
     } catch (e: FileNotFoundException) {
-        return ResultOf2.Failure(UriExtensionsError.FileNotFound)
+        return UriResult.Failure(UriExtensionsError.FileNotFound)
     }
 }
 
@@ -46,7 +44,7 @@ fun Uri.readContentFromUri(context: Context): ResultOf2<ByteArray, UriExtensions
  * @return SUCCESS: Uri for the created file. FAILURE: UriExtensionError
  */
 @RequiresApi(Build.VERSION_CODES.Q)
-fun Context.createFileInPublicAndWriteData(path: Path = Path.Documents, folderPath: String = "", displayName: String, mimeType: String? = null, bytesToWrite: ByteArray): ResultOf2<Uri, UriExtensionsError> {
+fun Context.createFileInPublicAndWriteData(path: Path = Path.Documents, folderPath: String = "", displayName: String, mimeType: String? = null, bytesToWrite: ByteArray): UriResult<Uri, UriExtensionsError> {
     val uri = MediaStore.Files.getContentUri("external")
     val relativePath = "${path.name}${if(folderPath.isBlank()) "" else File.separator + folderPath}"
     val contentValues = ContentValues().apply {
@@ -57,9 +55,9 @@ fun Context.createFileInPublicAndWriteData(path: Path = Path.Documents, folderPa
         put(MediaColumns.IS_PENDING, 0) //Wenn 1, dann muss das am Schluss auf 0 gesetzt werden. Erst dann kann es vom System indiziert werden. Also immer bei 0 lassen :D
     }
 
-    val fileUri = contentResolver.insert(uri, contentValues) ?: return ResultOf2.Failure(UriExtensionsError.InsertionFailed)
-    fileUri.writeDataToFile(this, bytesToWrite).ifFalse { return ResultOf2.Failure(UriExtensionsError.WriteFailed) }
-    return ResultOf2.Success(fileUri)
+    val fileUri = contentResolver.insert(uri, contentValues) ?: return UriResult.Failure(UriExtensionsError.InsertionFailed)
+    if(fileUri.writeDataToFile(this, bytesToWrite).not()) return UriResult.Failure(UriExtensionsError.WriteFailed)
+    return UriResult.Success(fileUri)
 }
 
 fun Context.deleteFileThroughUri(uri: Uri) = contentResolver.delete(uri, null, null)
@@ -87,7 +85,7 @@ fun Uri.writeDataToFile(context: Context, data: ByteArray) :Boolean {
  * @return List with [AndroidFile]
  */
 @RequiresApi(Build.VERSION_CODES.Q)
-fun Context.getAllAccessibleFilesFromPublic(): ResultOf2<List<AndroidFile>, List<UriExtensionsError>> {
+fun Context.getAllAccessibleFilesFromPublic(): UriResult<List<AndroidFile>, List<UriExtensionsError>> {
     val uri = MediaStore.Files.getContentUri("external")
     val files = mutableListOf<AndroidFile>()
     val error = mutableListOf<UriExtensionsError>()
@@ -117,7 +115,12 @@ fun Context.getAllAccessibleFilesFromPublic(): ResultOf2<List<AndroidFile>, List
         } while (cursor.moveToNext())
     }
 
-    return if(error.isEmpty() || files.isNotEmpty()) ResultOf2.Success(files) else ResultOf2.Failure(error)
+    return if(error.isEmpty() || files.isNotEmpty()) UriResult.Success(files) else UriResult.Failure(error)
+}
+
+sealed class UriResult<out T, out V> {
+    data class Success<out E>(val value: E): UriResult<E, Nothing>()
+    data class Failure<out Q>(val value: Q): UriResult<Nothing, Q>()
 }
 
 //ToDo: getAllAccessableFiles --> Search for specific file through name and or extension
