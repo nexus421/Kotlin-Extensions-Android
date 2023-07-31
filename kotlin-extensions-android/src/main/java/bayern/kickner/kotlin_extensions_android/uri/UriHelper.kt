@@ -3,12 +3,14 @@ package bayern.kickner.kotlin_extensions_android.uri
 import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
+import android.database.Cursor
 import android.net.Uri
 import android.os.Build
 import android.provider.BaseColumns
 import android.provider.MediaStore
 import android.provider.MediaStore.MediaColumns
 import android.provider.OpenableColumns
+import androidx.annotation.IntRange
 import androidx.annotation.RequiresApi
 import java.io.File
 import java.io.FileNotFoundException
@@ -117,6 +119,36 @@ fun Context.getAllAccessibleFilesFromPublic(): UriResult<List<AndroidFile>, List
 
     return if(error.isEmpty() || files.isNotEmpty()) UriResult.Success(files) else UriResult.Failure(error)
 }
+
+/**
+ * Get the filename from an uri pointing to an file.
+ *
+ * @return Filename as String or null if not existing or something else.
+ */
+fun Uri.getFileName(context: Context): String? {
+    if (scheme == "content") {
+        val cursor: Cursor = context.contentResolver.query(this, null, null, null, null) ?: return null
+        cursor.use { c ->
+            if (c.moveToFirst()) {
+                val index = c.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                if(index < 0) return null
+                return c.getString(index)
+            }
+        }
+    }
+
+    path?.let {
+        val cut = it.lastIndexOf('/')
+
+        if (cut != -1) {
+            return it.substring(cut + 1)
+        }
+    }
+
+    return null
+}
+
+//ToDo: Mehrere Kurz-Möglichkeiten für Cursor-Felder, wie oben bei DISPLAY_NAME
 
 sealed class UriResult<out T, out V> {
     data class Success<out E>(val value: E): UriResult<E, Nothing>()
