@@ -13,7 +13,10 @@ import android.graphics.Insets
 import android.graphics.Rect
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.net.Uri
+import android.nfc.NfcAdapter
 import android.os.Build
+import android.provider.Settings
 import android.util.DisplayMetrics
 import android.util.Size
 import android.view.View
@@ -203,8 +206,27 @@ fun Context.getScreenSize(): Size {
 
 fun Context.windowManager() = ContextCompat.getSystemService(this, WindowManager::class.java)
 
-fun Context.connectivityManager() = ContextCompat.getSystemService(this, ConnectivityManager::class.java)
+fun Context.connectivityManager() =
+    ContextCompat.getSystemService(this, ConnectivityManager::class.java)
 
-fun Context.notificationManager() = ContextCompat.getSystemService(this, NotificationManager::class.java)
+fun Context.notificationManager() =
+    ContextCompat.getSystemService(this, NotificationManager::class.java)
 
 fun Context.downloadManager() = ContextCompat.getSystemService(this, DownloadManager::class.java)
+
+/**
+ * If true, this device has NFC support.
+ */
+fun Activity.hasNfc() = NfcAdapter.getDefaultAdapter(this) != null
+
+/**
+ * Opens the system settings from this app.
+ * Here the user can edit permissions, cache, etc.
+ */
+fun Activity.openAppSystemSettings() {
+    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+        data = Uri.parse("package:$packageName")
+    }
+    startActivity(intent)
+}
+
