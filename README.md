@@ -2,7 +2,7 @@
 
 ***Now Available on Jitpack!***
 In settings.gradle, add *maven { url 'https://jitpack.io' }* 
-In your build.gradle add *implementation 'com.github.nexus421:Kotlin-Extensions-Android:3.0.0'* (Check Releases for other versions)
+In your build.gradle add *implementation 'com.github.nexus421:Kotlin-Extensions-Android:3.0.1'* (Check Releases for other versions)
 
 **Warning: Major changes in Version >= 3**
 This Repo now only contains Android-specific extensions, etc. If you want to use the general Kotlin-JVM-Extensions, also implement my repository "KotNexLib"! 
