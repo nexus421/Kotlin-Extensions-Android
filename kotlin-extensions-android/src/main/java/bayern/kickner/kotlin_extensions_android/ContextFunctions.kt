@@ -40,20 +40,26 @@ import com.google.android.material.snackbar.Snackbar
 fun Context.isActivity() = this is Activity
 
 /**
- * Eine Aktion dieses Objekts kann auf dem Main-Thread ausgeführt werden. Häufig nötig für GUI-Zugriffe.
+ * Shows this toast on the main thread. So you can use it everywhere!
  */
-fun Context.showToastOnMainThread(s: String, length: Int = Toast.LENGTH_LONG) = runOnUiThread { Toast.makeText(this, s, length).show() }
+fun Context.showToastOnMainThread(s: String, showLong: Boolean = true) =
+    runOnUiThread { showToast(s, showLong) }
 
 fun Activity.getRootView() = findViewById<View>(android.R.id.content).rootView
 
-fun Activity.startActivity(destination: Class<*>, finishCallingActivity: Boolean = false, intentExtras: (Intent.() -> Unit)? = null) {
+fun Activity.startActivity(
+    destination: Class<*>,
+    finishCallingActivity: Boolean = false,
+    intentExtras: (Intent.() -> Unit)? = null
+) {
     val i = Intent(this, destination)
     intentExtras?.invoke(i)
     startActivity(i)
     if (finishCallingActivity) finish()
 }
 
-fun Context.showToast(msg: String, length: Int = Toast.LENGTH_LONG) = Toast.makeText(this, msg, length).show()
+fun Context.showToast(msg: String, showLong: Boolean = true) =
+    Toast.makeText(this, msg, if (showLong) Toast.LENGTH_LONG else Toast.LENGTH_SHORT).show()
 
 fun Context.hasCameraPermission() = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PERMISSION_GRANTED
 

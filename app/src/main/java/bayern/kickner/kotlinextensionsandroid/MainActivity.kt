@@ -6,6 +6,8 @@ import android.os.Environment
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import bayern.kickner.kotlin_extensions_android.showDialogWithTimer
+import bayern.kickner.kotlin_extensions_android.showToastOnMainThread
 import bayern.kickner.kotlin_extensions_android.uri.AndroidFile
 import bayern.kickner.kotlin_extensions_android.uri.deleteFileThroughUri
 import java.io.File
@@ -29,6 +31,10 @@ class MainActivity : AppCompatActivity() {
 //                is ResultOf2.Failure -> Toast.makeText(this, result.value.name, Toast.LENGTH_SHORT).show()
 //                is ResultOf2.Success -> uri = result.value
 //            }
+
+            showDialogWithTimer(this, "Test", "Das ist ein Test Text") {
+                showToastOnMainThread("Bananarama")
+            }
         }
 
         btn2.setOnClickListener {
