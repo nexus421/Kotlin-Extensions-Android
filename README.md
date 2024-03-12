@@ -9,7 +9,7 @@ In settings.gradle, add:
 
 In your build.gradle add:
 
-    implementation ("com.github.nexus421:Kotlin-Extensions-Android:3.2.0")
+    implementation ("com.github.nexus421:Kotlin-Extensions-Android:3.3.0")
 
 (Check Releases for other versions)
 
@@ -23,6 +23,7 @@ Kotlin-JVM-Extensions, also implement my repository "KotNexLib"!
 **Context.showToast()** -> Quicker way to show a toast
 **Context.inflate()** -> Quicker way to inflate XML-Layouts
 **checkAndRequestPermission(...)** -> Easy to use permission check and request if necessary
+**Context.vibrate()**
 
 Do you have any other great extensions you wish to include? No Problem! 
 

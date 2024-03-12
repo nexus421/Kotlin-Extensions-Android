@@ -8,7 +8,6 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.graphics.Insets
 import android.graphics.Rect
 import android.net.ConnectivityManager
@@ -16,6 +15,8 @@ import android.net.NetworkCapabilities
 import android.net.Uri
 import android.nfc.NfcAdapter
 import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.provider.Settings
 import android.util.DisplayMetrics
 import android.util.Size
@@ -26,7 +27,6 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.ColorInt
 import androidx.annotation.LayoutRes
 import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresPermission
@@ -86,40 +86,6 @@ fun Activity.showSimpleDialog(title: String, msg: String) {
         .setMessage(msg)
         .setPositiveButton("OK", null)
         .show()
-}
-
-@Deprecated("Use View.snackbar")
-fun Activity.successSnackbar(msg: String, timeLong: Boolean = true) {
-    Snackbar.make(window.decorView.findViewById(android.R.id.content), msg, if (timeLong) Snackbar.LENGTH_LONG else Snackbar.LENGTH_SHORT)
-        .setBackgroundTint(Color.parseColor("#0FCA3A"))
-        .show()
-}
-
-@Deprecated("Use View.snackbar")
-fun Activity.errorSnackbar(msg: String, timeLong: Boolean = true) {
-    Snackbar.make(window.decorView.findViewById(android.R.id.content), msg, if (timeLong) Snackbar.LENGTH_LONG else Snackbar.LENGTH_SHORT)
-        .setBackgroundTint(Color.parseColor("#D21A1A"))
-        .show()
-}
-
-@Deprecated("Use View.snackbar")
-fun Activity.infoSnackbar(msg: String, timeLong: Boolean = true) {
-    Snackbar.make(window.decorView.findViewById(android.R.id.content), msg, if (timeLong) Snackbar.LENGTH_LONG else Snackbar.LENGTH_SHORT)
-        .setBackgroundTint(Color.parseColor("#1985DA"))
-        .show()
-}
-
-@Deprecated("Use View.snackbar")
-fun Activity.warningSnackbar(msg: String, timeLong: Boolean = true) {
-    Snackbar.make(window.decorView.findViewById(android.R.id.content), msg, if (timeLong) Snackbar.LENGTH_LONG else Snackbar.LENGTH_SHORT)
-        .setBackgroundTint(Color.parseColor("#E09C24"))
-        .show()
-}
-
-@Deprecated("Use View.snackbar")
-fun Activity.snackbar(msg: String, timeLong: Boolean = true, @ColorInt backgroundColor: Int = Color.parseColor("#E09C24")): Snackbar {
-    return Snackbar.make(window.decorView.findViewById(android.R.id.content), msg, if (timeLong) Snackbar.LENGTH_LONG else Snackbar.LENGTH_SHORT)
-        .setBackgroundTint(backgroundColor)
 }
 
 fun View.snackbar(message: String, duration: Int = Snackbar.LENGTH_LONG) {
@@ -234,5 +200,21 @@ fun Activity.openAppSystemSettings() {
         data = Uri.parse("package:$packageName")
     }
     startActivity(intent)
+}
+
+/**
+ * Vibrates for [timeMillis].
+ * WARNING: requires the vibration Permission in your manifest!
+ * <uses-permission android:name="android.permission.VIBRATE" />
+ */
+fun Context.vibrate(timeMillis: Long = 200) {
+    val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+    if (Build.VERSION.SDK_INT >= 26) vibrator.vibrate(
+        VibrationEffect.createOneShot(
+            timeMillis,
+            VibrationEffect.DEFAULT_AMPLITUDE
+        )
+    )
+    else vibrator.vibrate(timeMillis)
 }
 
