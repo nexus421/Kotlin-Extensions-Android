@@ -1,6 +1,7 @@
 package bayern.kickner.kotlin_extensions_android
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.DownloadManager
@@ -207,6 +208,7 @@ fun Activity.openAppSystemSettings() {
  * WARNING: requires the vibration Permission in your manifest!
  * <uses-permission android:name="android.permission.VIBRATE" />
  */
+@SuppressLint("MissingPermission")
 fun Context.vibrate(timeMillis: Long = 200) {
     val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
     if (Build.VERSION.SDK_INT >= 26) vibrator.vibrate(
@@ -217,4 +219,23 @@ fun Context.vibrate(timeMillis: Long = 200) {
     )
     else vibrator.vibrate(timeMillis)
 }
+
+/**
+ * Checks if the current instance was installed from Google Play or was installed through an APK directly.
+ */
+fun Context.installedFromGooglePlay(): Boolean {
+    return try { // A list with valid installers package name
+        val validInstallers = listOf("com.android.vending", "com.google.android.feedback")
+
+        // The package name of the app that has installed your app
+        val installer = packageManager.getInstallerPackageName(packageName)
+
+        // true if your app has been downloaded from Play Store
+        installer != null && validInstallers.contains(installer)
+    } catch (e: Exception) {
+        System.err.println(e.stackTraceToString())
+        false
+    }
+}
+
 
