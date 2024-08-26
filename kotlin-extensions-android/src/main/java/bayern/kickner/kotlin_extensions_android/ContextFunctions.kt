@@ -6,6 +6,8 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.app.DownloadManager
 import android.app.NotificationManager
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -236,6 +238,17 @@ fun Context.installedFromGooglePlay(): Boolean {
         System.err.println(e.stackTraceToString())
         false
     }
+}
+
+/**
+ * Copies the specified text to the clipboard.
+ *
+ * @param text The text to be copied to the clipboard.
+ * @param label An optional label to be assigned to the copied text.
+ */
+fun Context.copyToClipboard(text: String, label: String = "") {
+    val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
+    clipboard?.setPrimaryClip(ClipData.newPlainText(label, text))
 }
 
 
