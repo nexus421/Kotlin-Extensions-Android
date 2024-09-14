@@ -64,9 +64,11 @@ fun Activity.startActivity(
 fun Context.showToast(msg: String, showLong: Boolean = true) =
     Toast.makeText(this, msg, if (showLong) Toast.LENGTH_LONG else Toast.LENGTH_SHORT).show()
 
-fun Context.hasCameraPermission() = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PERMISSION_GRANTED
+fun Context.hasCameraPermission() =
+    ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PERMISSION_GRANTED
 
-fun Context.hasFineLocationPermission() = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PERMISSION_GRANTED
+fun Context.hasFineLocationPermission() =
+    ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PERMISSION_GRANTED
 
 fun Context.inflate(@LayoutRes layoutId: Int) = View.inflate(this, layoutId, null)
 
@@ -105,7 +107,11 @@ fun View.snackbar(message: String, duration: Int = Snackbar.LENGTH_LONG) {
  * @param onResult the result from the permission check.
  */
 fun ComponentActivity.checkAndRequestPermission(manifestPermission: String, onResult: (Boolean) -> Unit) {
-    if (ContextCompat.checkSelfPermission(this, manifestPermission) == PackageManager.PERMISSION_GRANTED) return onResult(true)
+    if (ContextCompat.checkSelfPermission(
+            this,
+            manifestPermission
+        ) == PackageManager.PERMISSION_GRANTED
+    ) return onResult(true)
     registerForActivityResult(ActivityResultContracts.RequestPermission(), onResult).launch(manifestPermission)
 }
 
@@ -120,9 +126,20 @@ fun ComponentActivity.checkAndRequestPermission(manifestPermission: String, onRe
  * @param manifestPermissions Permission Strings to check from Manifest.permission.*
  * @param onResult the result from the permission check. Map<PermissionString, Granted>
  */
-fun ComponentActivity.checkAndRequestPermissions(manifestPermissions: List<String>, onResult: (Map<String, Boolean>) -> Unit) {
-    if (manifestPermissions.find { ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED } == null) return onResult(manifestPermissions.associateBy({ it }, { true }))
-    registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions(), onResult).launch(manifestPermissions.toTypedArray())
+fun ComponentActivity.checkAndRequestPermissions(
+    manifestPermissions: List<String>,
+    onResult: (Map<String, Boolean>) -> Unit
+) {
+    if (manifestPermissions.find {
+            ContextCompat.checkSelfPermission(
+                this,
+                it
+            ) != PackageManager.PERMISSION_GRANTED
+        } == null) return onResult(manifestPermissions.associateBy({ it }, { true }))
+    registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions(),
+        onResult
+    ).launch(manifestPermissions.toTypedArray())
 }
 
 /**
@@ -132,7 +149,8 @@ fun ComponentActivity.checkAndRequestPermissions(manifestPermissions: List<Strin
  *
  * @return true if all are granted, false if at least one is not granted
  */
-fun Activity.hasPermission(vararg permissions: String) = permissions.find { ActivityCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED } == null
+fun Activity.hasPermission(vararg permissions: String) =
+    permissions.find { ActivityCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED } == null
 
 fun Activity.hideKeyboard() {
     val imm: InputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -206,21 +224,35 @@ fun Activity.openAppSystemSettings() {
 }
 
 /**
- * Vibrates for [timeMillis].
- * WARNING: requires the vibration Permission in your manifest!
+ * Triggers the device's vibration system to produce a series of vibrations with specified parameters.
+ *
+ *
+ * Important: requires the vibration Permission in your manifest!
  * <uses-permission android:name="android.permission.VIBRATE" />
+ *
+ * @param vibrateTimeMS The duration of each vibration in milliseconds. Default is 10 milliseconds.
+ * @param pauseTimeMS The duration of the pause between each vibration in milliseconds. Default is 50 milliseconds.
+ * @param repeat The number of times to repeat the vibration pattern. Default is 0, which means there is only a single vibration and [pauseTimeMS] is not relevant
  */
 @SuppressLint("MissingPermission")
-fun Context.vibrate(timeMillis: Long = 200) {
+fun Context.vibrate(vibrateTimeMS: Long = 10, pauseTimeMS: Long = 50, repeat: Int = 0) {
     val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-    if (Build.VERSION.SDK_INT >= 26) vibrator.vibrate(
-        VibrationEffect.createOneShot(
-            timeMillis,
-            VibrationEffect.DEFAULT_AMPLITUDE
+    (0..repeat).forEach { _ ->
+        if (Build.VERSION.SDK_INT >= 26) vibrator.vibrate(
+            VibrationEffect.createOneShot(
+                vibrateTimeMS,
+                VibrationEffect.DEFAULT_AMPLITUDE
+            )
         )
-    )
-    else vibrator.vibrate(timeMillis)
+        else vibrator.vibrate(vibrateTimeMS)
+
+        if (repeat > 0) try {
+            Thread.sleep(pauseTimeMS)
+        } catch (ignore: Throwable) {
+        }
+    }
 }
+
 
 /**
  * Checks if the current instance was installed from Google Play or was installed through an APK directly.
