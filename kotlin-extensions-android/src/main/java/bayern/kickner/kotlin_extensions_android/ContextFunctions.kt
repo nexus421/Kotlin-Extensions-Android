@@ -223,37 +223,6 @@ fun Activity.openAppSystemSettings() {
 }
 
 /**
- * Triggers the device's vibration system to produce a series of vibrations with specified parameters.
- *
- *
- * Important: requires the vibration Permission in your manifest!
- * <uses-permission android:name="android.permission.VIBRATE" />
- *
- * @param vibrateTimeMS The duration of each vibration in milliseconds. Default is 10 milliseconds.
- * @param pauseTimeMS The duration of the pause between each vibration in milliseconds. Default is 50 milliseconds.
- * @param repeat The number of times to repeat the vibration pattern. Default is 0, which means there is only a single vibration and [pauseTimeMS] is not relevant
- */
-@SuppressLint("MissingPermission")
-fun Context.vibrate(vibrateTimeMS: Long = 10, pauseTimeMS: Long = 50, repeat: Int = 0) {
-    val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-    (0..repeat).forEach { _ ->
-        if (Build.VERSION.SDK_INT >= 26) vibrator.vibrate(
-            VibrationEffect.createOneShot(
-                vibrateTimeMS,
-                VibrationEffect.DEFAULT_AMPLITUDE
-            )
-        )
-        else vibrator.vibrate(vibrateTimeMS)
-
-        if (repeat > 0) try {
-            Thread.sleep(pauseTimeMS)
-        } catch (ignore: Throwable) {
-        }
-    }
-}
-
-
-/**
  * Checks if the current instance was installed from Google Play or was installed through an APK directly.
  */
 fun Context.installedFromGooglePlay(): Boolean {

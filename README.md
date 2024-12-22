@@ -9,7 +9,7 @@ In settings.gradle, add:
 
 In your build.gradle add:
 
-    implementation ("com.github.nexus421:Kotlin-Extensions-Android:3.3.0")
+    implementation ("com.github.nexus421:Kotlin-Extensions-Android:3.6.0")
 
 (Check Releases for other versions)
 
