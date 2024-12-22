@@ -1,8 +1,8 @@
 package bayern.kickner.kotlinextensionsandroid
 
+import android.content.Context
 import android.net.Uri
-import android.os.Bundle
-import android.os.Environment
+import android.os.*
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -44,13 +44,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         btn3.setOnClickListener {
-//            when (val result = getAllAccessibleFilesFromPublic()) {
-//                is ResultOf2.Failure -> Toast.makeText(this, result.value.joinToString { it.name }, Toast.LENGTH_SHORT).show()
-//                is ResultOf2.Success -> {
-//                    available = result.value
-//                    text.text = result.value.joinToString(separator = "\n")
-//                }
-//            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                val vibratorManager = getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+                vibratorManager.defaultVibrator.vibrate(VibrationEffect.createOneShot(200, 1))
+
+            }
         }
 
         btn4.setOnClickListener {

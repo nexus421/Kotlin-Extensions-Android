@@ -17,9 +17,7 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
 import android.nfc.NfcAdapter
-import android.os.Build
-import android.os.VibrationEffect
-import android.os.Vibrator
+import android.os.*
 import android.provider.Settings
 import android.util.DisplayMetrics
 import android.util.Size
@@ -30,6 +28,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.IntRange
 import androidx.annotation.LayoutRes
 import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresPermission
@@ -64,9 +63,11 @@ fun Activity.startActivity(
 fun Context.showToast(msg: String, showLong: Boolean = true) =
     Toast.makeText(this, msg, if (showLong) Toast.LENGTH_LONG else Toast.LENGTH_SHORT).show()
 
-fun Context.hasCameraPermission() = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PERMISSION_GRANTED
+fun Context.hasCameraPermission() =
+    ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PERMISSION_GRANTED
 
-fun Context.hasFineLocationPermission() = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PERMISSION_GRANTED
+fun Context.hasFineLocationPermission() =
+    ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PERMISSION_GRANTED
 
 fun Context.inflate(@LayoutRes layoutId: Int) = View.inflate(this, layoutId, null)
 
@@ -105,7 +106,11 @@ fun View.snackbar(message: String, duration: Int = Snackbar.LENGTH_LONG) {
  * @param onResult the result from the permission check.
  */
 fun ComponentActivity.checkAndRequestPermission(manifestPermission: String, onResult: (Boolean) -> Unit) {
-    if (ContextCompat.checkSelfPermission(this, manifestPermission) == PackageManager.PERMISSION_GRANTED) return onResult(true)
+    if (ContextCompat.checkSelfPermission(
+            this,
+            manifestPermission
+        ) == PackageManager.PERMISSION_GRANTED
+    ) return onResult(true)
     registerForActivityResult(ActivityResultContracts.RequestPermission(), onResult).launch(manifestPermission)
 }
 
@@ -120,9 +125,20 @@ fun ComponentActivity.checkAndRequestPermission(manifestPermission: String, onRe
  * @param manifestPermissions Permission Strings to check from Manifest.permission.*
  * @param onResult the result from the permission check. Map<PermissionString, Granted>
  */
-fun ComponentActivity.checkAndRequestPermissions(manifestPermissions: List<String>, onResult: (Map<String, Boolean>) -> Unit) {
-    if (manifestPermissions.find { ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED } == null) return onResult(manifestPermissions.associateBy({ it }, { true }))
-    registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions(), onResult).launch(manifestPermissions.toTypedArray())
+fun ComponentActivity.checkAndRequestPermissions(
+    manifestPermissions: List<String>,
+    onResult: (Map<String, Boolean>) -> Unit
+) {
+    if (manifestPermissions.find {
+            ContextCompat.checkSelfPermission(
+                this,
+                it
+            ) != PackageManager.PERMISSION_GRANTED
+        } == null) return onResult(manifestPermissions.associateBy({ it }, { true }))
+    registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions(),
+        onResult
+    ).launch(manifestPermissions.toTypedArray())
 }
 
 /**
@@ -132,7 +148,8 @@ fun ComponentActivity.checkAndRequestPermissions(manifestPermissions: List<Strin
  *
  * @return true if all are granted, false if at least one is not granted
  */
-fun Activity.hasPermission(vararg permissions: String) = permissions.find { ActivityCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED } == null
+fun Activity.hasPermission(vararg permissions: String) =
+    permissions.find { ActivityCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED } == null
 
 fun Activity.hideKeyboard() {
     val imm: InputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -206,23 +223,6 @@ fun Activity.openAppSystemSettings() {
 }
 
 /**
- * Vibrates for [timeMillis].
- * WARNING: requires the vibration Permission in your manifest!
- * <uses-permission android:name="android.permission.VIBRATE" />
- */
-@SuppressLint("MissingPermission")
-fun Context.vibrate(timeMillis: Long = 200) {
-    val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-    if (Build.VERSION.SDK_INT >= 26) vibrator.vibrate(
-        VibrationEffect.createOneShot(
-            timeMillis,
-            VibrationEffect.DEFAULT_AMPLITUDE
-        )
-    )
-    else vibrator.vibrate(timeMillis)
-}
-
-/**
  * Checks if the current instance was installed from Google Play or was installed through an APK directly.
  */
 fun Context.installedFromGooglePlay(): Boolean {
@@ -241,6 +241,39 @@ fun Context.installedFromGooglePlay(): Boolean {
 }
 
 /**
+ * Vibrates for [timeMillis].
+ * WARNING: requires the vibration Permission in your manifest!
+ * <uses-permission android:name="android.permission.VIBRATE" />
+ *
+ * @param timeMillis the time, how long the device should vibrate. Note: Some devices don't support short times. Samsung won't vibrate below 30ms as far as I know!
+ * @param strength the strength of the device vibration. Defaults to the default device vibration strength! Must between 1 and 255 oder -1 for the device default.
+ */
+@RequiresApi(Build.VERSION_CODES.O)
+@SuppressLint("MissingPermission")
+fun Context.vibrate(
+    timeMillis: Long = 50,
+    @IntRange(from = 1, to = 255) strength: Int = VibrationEffect.DEFAULT_AMPLITUDE
+) {
+    val vibrator = getDefaultVibrator()
+
+    vibrator.vibrate(
+        VibrationEffect.createOneShot(
+            timeMillis,
+            strength
+        )
+    )
+}
+
+/**
+ * Get the default vibrator from the System.
+ * For simple vibration you may use [vibrate]. Otherwise, you may use a variant of [Vibrator.vibrate].
+ */
+fun Context.getDefaultVibrator() =
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) (getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager).defaultVibrator else getSystemService(
+        Context.VIBRATOR_SERVICE
+    ) as Vibrator
+
+/**
  * Copies the specified text to the clipboard.
  *
  * @param text The text to be copied to the clipboard.
@@ -250,5 +283,12 @@ fun Context.copyToClipboard(text: String, label: String = "") {
     val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
     clipboard?.setPrimaryClip(ClipData.newPlainText(label, text))
 }
+
+/**
+ * Returns true if the device is in an interactive state.
+ * When this method returns true, the device is awake and ready to interact with the user (although this is not a guarantee that the user is actively interacting with the device just this moment). The main screen is usually turned on while in this state. Certain features, such as the proximity sensor, may temporarily turn off the screen while still leaving the device in an interactive state. Note in particular that the device is still considered to be interactive while dreaming (since dreams can be interactive) but not when it is dozing or asleep.
+ * When this method returns false, the device is dozing or asleep and must be awoken before it will become ready to interact with the user again. The main screen is usually turned off while in this state. Certain features, such as "ambient mode" may cause the main screen to remain on (albeit in a low power state) to display system-provided content while the device dozes.
+ */
+fun Context.isScreenOn() = (getSystemService(Context.POWER_SERVICE) as PowerManager).isInteractive
 
 
