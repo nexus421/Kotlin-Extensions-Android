@@ -9,6 +9,7 @@ import android.os.Build
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
+import androidx.core.graphics.createBitmap
 import java.io.File
 import java.nio.file.Files
 
@@ -16,8 +17,8 @@ import java.nio.file.Files
 fun Drawable.drawableToBitmap(): Bitmap {
     if (this is BitmapDrawable && bitmap != null) return bitmap
 
-    val bitmap = if (intrinsicWidth <= 0 || intrinsicHeight <= 0) Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
-    else Bitmap.createBitmap(intrinsicWidth, intrinsicHeight, Bitmap.Config.ARGB_8888)
+    val bitmap = if (intrinsicWidth <= 0 || intrinsicHeight <= 0) createBitmap(1, 1)
+    else createBitmap(intrinsicWidth, intrinsicHeight)
 
     val canvas = Canvas(bitmap)
     setBounds(0, 0, canvas.width, canvas.height)

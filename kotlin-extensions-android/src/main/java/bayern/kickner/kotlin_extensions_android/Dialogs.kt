@@ -17,6 +17,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+/**
+ * This will show a simple dialog with a timer.
+ * The user can cancel or continue after the timer has finished.
+ */
 fun showDialogWithTimer(
     activity: ComponentActivity,
     title: String,

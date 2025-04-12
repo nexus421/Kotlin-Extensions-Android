@@ -7,11 +7,11 @@ import java.io.Serializable
 
 /**
  * This activity is a helper for the case that the system kills the app.
- * Via [addNewSaveableData] and [getSavedData] objects can be stashed away and restored later. The objects must be serializable.
+ * Via [SavableActivity] and [getSavedData] objects can be stashed away and restored later. The objects must be serializable.
  * Via the variable [activityWasRecreated] one can find out if the activity was recreated (true) or not (false)
  */
 @Experimental
-class SaveableActivity : ComponentActivity() {
+class SavableActivity : ComponentActivity() {
 
     private val savedData = HashMap<String, Serializable>()
     var activityWasRecreated = false
@@ -20,14 +20,14 @@ class SaveableActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        savedData.clear()
         if (savedInstanceState?.getBoolean("activityKilled") == true) {
+            savedData.clear()
             savedData.putAll(savedInstanceState.getSerializable("saveable") as? Map<String, Serializable> ?: emptyMap())
             activityWasRecreated = true
         }
     }
 
-    fun <T : Serializable> addNewSaveableData(key: String, value: T) {
+    fun <T : Serializable> addNewSavableData(key: String, value: T) {
         savedData[key] = value
     }
 
@@ -35,7 +35,7 @@ class SaveableActivity : ComponentActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putSerializable("saveable", savedData)
+        outState.putSerializable("savable", savedData)
         outState.putBoolean("activityKilled", true)
     }
 
