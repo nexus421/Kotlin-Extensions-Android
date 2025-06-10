@@ -37,6 +37,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker.PERMISSION_GRANTED
 import com.google.android.material.snackbar.Snackbar
+import kotnexlib.tryOrNull
 
 
 fun Context.isActivity() = this is Activity
@@ -291,4 +292,19 @@ fun Context.copyToClipboard(text: String, label: String = "") {
  */
 fun Context.isScreenOn() = (getSystemService(Context.POWER_SERVICE) as PowerManager).isInteractive
 
+fun Context.openDisplaySettings() = tryOrNull { startActivity(Intent(Settings.ACTION_DISPLAY_SETTINGS)) } != null
+fun Context.openWifiSettings() = tryOrNull { startActivity(Intent(Settings.ACTION_WIFI_SETTINGS)) } != null
+fun Context.openBluetoothSettings() = tryOrNull { startActivity(Intent(Settings.ACTION_BLUETOOTH_SETTINGS)) } != null
+fun Context.openAirplaneModeSettings() =
+    tryOrNull { startActivity(Intent(Settings.ACTION_AIRPLANE_MODE_SETTINGS)) } != null
 
+fun Context.openDateSettings() = tryOrNull { startActivity(Intent(Settings.ACTION_DATE_SETTINGS)) } != null
+fun Context.openLocaleSettings() = tryOrNull { startActivity(Intent(Settings.ACTION_LOCALE_SETTINGS)) } != null
+fun Context.openInputMethodSettings() =
+    tryOrNull { startActivity(Intent(Settings.ACTION_INPUT_METHOD_SETTINGS)) } != null
+
+fun Context.openAccessibilitySettings() =
+    tryOrNull { startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)) } != null
+
+fun Context.isAutoRotationActive() =
+    Settings.System.getInt(contentResolver, Settings.System.ACCELEROMETER_ROTATION) == 1

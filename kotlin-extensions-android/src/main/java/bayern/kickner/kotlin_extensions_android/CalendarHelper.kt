@@ -10,7 +10,8 @@ import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotnexlib.ResultOf
-import java.util.TimeZone
+import java.io.Serializable
+import java.util.*
 import kotlin.time.Duration.Companion.minutes
 
 
@@ -108,7 +109,7 @@ object CalendarHelper {
      * @param startTime Start time in UTC milliseconds, nullable.
      * @param endTime End time in UTC milliseconds, nullable.
      */
-    data class EventInfo(val id: Long, val title: String, val startTime: Long?, val endTime: Long?)
+    data class EventInfo(val id: Long, val title: String, val startTime: Long?, val endTime: Long?) : Serializable
 
     /**
      * Reads events from a specific calendar, optionally filtering by a time range.
@@ -253,7 +254,7 @@ object CalendarHelper {
      * @param displayName The user-visible name of the calendar.
      * @param accountName The name of the account associated with the calendar.
      */
-    data class CalendarInfo(val calendarId: Long, val displayName: String, val accountName: String)
+    data class CalendarInfo(val calendarId: Long, val displayName: String, val accountName: String) : Serializable
 
     /**
      * Queries available calendars, filtering for those owned by the user
