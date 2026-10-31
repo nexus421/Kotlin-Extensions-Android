@@ -2,6 +2,10 @@
 
 [![](https://jitpack.io/v/nexus421/Kotlin-Extensions-Android.svg)](https://jitpack.io/#nexus421/Kotlin-Extensions-Android)
 
+> [!NOTE]
+> **Maintenance mode:** This project is no longer under active development.
+> Bug reports and pull requests are still welcome and will be reviewed.
+
 A comprehensive collection of Kotlin extensions and utility functions for Android development that simplifies common
 tasks and reduces boilerplate code.
 
